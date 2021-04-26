@@ -1,6 +1,8 @@
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.my.config.AppConfig;
 import org.springframework.my.service.IndexService;
+import org.springframework.my.service.OrderService;
+import org.springframework.my.service.ProductService;
 import org.springframework.my.service.UserService;
 
 /**
@@ -18,5 +20,9 @@ public class SpringContextTest {
 		UserService userService = context.getBean(UserService.class);
 		indexService.println();
 		userService.println();
+
+		// System.out.println(context.getBean(OrderService.class));
+
+		System.out.println(context.getBean(ProductService.class));
 	}
 }
