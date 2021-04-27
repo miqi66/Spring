@@ -557,6 +557,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				onRefresh();
 
 				// Check for listener beans and register them.
+				  // 检查监听器bean并注册它们
 				registerListeners();
 
 				// spring开始实例化单例非懒加载的类
@@ -864,6 +865,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
+		// 初始化上下文的转换服务
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -871,8 +873,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Register a default embedded value resolver if no bean post-processor
+		  // 如果没有bean的后置处理器，则注册一个默认的嵌入式值解析器
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
+		  //(例如PropertyPlaceholderConfigurer bean)在此之前注册:
 		// at this point, primarily for resolution in annotation attribute values.
+		  // 主要解析注解属性值
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
