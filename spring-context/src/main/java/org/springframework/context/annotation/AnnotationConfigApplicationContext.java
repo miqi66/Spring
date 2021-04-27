@@ -85,7 +85,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
 		// 调用无参构造器，初始化reader，scanner
 		this();
-		// 注册配置文件
+		// 注册配置类，因为配置类需要解析，一般不需要自己扫描
+		// beanDefinitionMap.put("appConfig", appConfigBeanDefiniton);
 		register(annotatedClasses);
 		// 初始化容器
 		refresh();
