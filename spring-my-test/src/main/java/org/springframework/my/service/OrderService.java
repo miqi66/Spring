@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class OrderService {
 
 	public OrderService() {
-		System.out.println("===========OrderService初始化了==============");
+		System.out.println("===========OrderService 实例化==============");
 	}
 
 

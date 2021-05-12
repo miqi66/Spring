@@ -23,6 +23,6 @@ public class SpringContextTest {
 
 		// System.out.println(context.getBean(OrderService.class));
 
-		System.out.println(context.getBean(ProductService.class));
+		// System.out.println(context.getBean(ProductService.class));
 	}
 }

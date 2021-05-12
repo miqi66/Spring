@@ -15,7 +15,7 @@ public class UserService {
 	private IndexService indexService;
 
 	public UserService() {
-		System.out.println("====================UserService 初始化了==================");
+		System.out.println("====================UserService 实例化==================");
 	}
 
 	public void println(){

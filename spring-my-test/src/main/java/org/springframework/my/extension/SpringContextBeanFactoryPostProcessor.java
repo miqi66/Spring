@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @Author miqi.x
  * @Date 2021/4/26 20:13
  */
-@Component
+// @Component
 public class SpringContextBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
 	/**
