@@ -71,6 +71,7 @@ import org.springframework.util.StringUtils;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Cache of singleton objects: bean name --> bean instance */
+	// 单例池，缓存了spring应用中所有的单例bean
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name --> ObjectFactory */
@@ -132,6 +133,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			// 单例对象添加到单例池中去
 			this.singletonObjects.put(beanName, singletonObject);
 			this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
@@ -149,9 +151,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
+		// singletonObjects 一级缓存map  单例池
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
+				// 把工厂对象put到二级缓存map -singletonFactories
 				this.singletonFactories.put(beanName, singletonFactory);
+				// 从三级缓存map-earlySingletonObjects中remove掉当前bean
+				   // 移除原因：去掉对象的一些细节，这三个缓存池map存的都是同一个对象。spring的做法是三个缓存池不能存在两个同时存在同一个对象
 				this.earlySingletonObjects.remove(beanName);
 				this.registeredSingletons.add(beanName);
 			}
@@ -202,8 +208,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
+			// 直接从单例池singletonObjects中获取对象
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
+				// 判断当前实例化的bean是否在正在销毁的集合里面
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -212,6 +220,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				//判断当前正实例化的bean是否在正在创建的集合中
+				// spring在实例化对象之前，不管是单例还是原型对象，它都会记录下这个bean正在创建，把beanName添加到set集合中
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -219,6 +229,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					// 调用外面的lambda对象的getObject()方法，调用真正的createBean()
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -335,6 +346,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+		/**
+		 * 1.this.inCreationCheckExclusions.contains(beanName)
+		 *   判断当前正在创建的bean是否在exclusion集合中，被排除的bean，程序员可以提供一些bean不被spring初始化
+		 *   就算被扫描到了，也不会被spring初始化。
+		 *
+		 * 2.this.singletonsCurrentlyInCreation.add(beanName)
+		 *   当前正在实例化的bean如果不在排除的集合中，那么把当前正要实例化bean的名称添加到正在创建的单例集合中去
+		 *   这个时候bean还没有被实例化，只是要准备去创建，做一些实例化之前的准备工作，bean的构造函数还没有被调用，还没有被实例化。
+		 */
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}

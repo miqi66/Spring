@@ -196,6 +196,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public Object getBean(String name) throws BeansException {
+		// 一开始的创建bean，还有输入注入或者程序员getBean
 		return doGetBean(name, null, null, false);
 	}
 
@@ -240,13 +241,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
-		// 验证bean的名字是否非法
+		// 验证bean的名字是否合法
 		String beanName = transformedBeanName(name);
+		// 定义了一个对象，用来存储将来返回的bean
 		Object bean;
 
-		// Eagerly check singleton cache for manually registered singletons.
-            //先检查单例缓存池是否已经注册了单例bean
+
+		//初始化bean之前，先检查单例缓存池是否已经手动注册了该spring单例bean
+        /**
+         * 因为一个spring bean被put到单例池的渠道有很多：
+		 *   1.Spring容器初始化-扫描类-实例化-bean初始化-put到容器中
+		 *   2.还有很多方法可以将一个bean放进单例池中去
+         */
 		Object sharedInstance = getSingleton(beanName);
+
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -263,7 +271,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
-			// 判断这个类是不是在创建过程中
+			// 判断当前类是不是在正在创建的原型集合中，即这里只会存原型，一般情况下，我们的类不是原型，而是单例
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
@@ -314,8 +322,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
+				// 实例化对象
 				// Create bean instance.
 				if (mbd.isSingleton()) {
+					// 第二次调用getSingleton，方法重载
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);

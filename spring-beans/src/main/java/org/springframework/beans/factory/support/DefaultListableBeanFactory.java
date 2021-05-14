@@ -1134,6 +1134,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 			if (instanceCandidate instanceof Class) {
+				/*
+				 * 属性注入入口，会去调用DependencyDescriptor.resolveCandidate()，里面继续调用beanFactory.getBean(beanName);->
+				 * 继续调用doGetBean(),获取bean或者创建bean
+				 */
 				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
 			}
 			Object result = instanceCandidate;
