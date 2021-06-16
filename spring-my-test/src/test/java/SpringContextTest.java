@@ -1,8 +1,6 @@
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.my.config.AppConfig;
 import org.springframework.my.service.IndexService;
-import org.springframework.my.service.OrderService;
-import org.springframework.my.service.ProductService;
 import org.springframework.my.service.UserService;
 
 /**
