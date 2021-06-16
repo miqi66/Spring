@@ -83,6 +83,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * e.g. {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
+		// 调用子类的默认构造方法，也会先去调用子类对应父类的默认构造方法。父类的默认构造方法中，会实例化BeanFactory-DefaultListableBeanFactory
 		// 调用无参构造器，初始化reader，scanner
 		this();
 		// 注册配置类，因为配置类需要解析，一般不需要自己扫描
